@@ -63,3 +63,102 @@ FROM employees e LEFT JOIN employees m ON e.manager_id=m.emp_id;
 
 --Question:20
 SELECT * FROM employees WHERE job_name='CLERK'
+
+--Question:21
+select * from employees where DATEDIFF(YEAR,hire_date,GETDATE())>27
+
+--Question:22
+select * from employees where salary<3500
+
+--Question:23
+select emp_name,job_name,salary from employees where job_name='ANALYST'
+
+--Question:24
+select * from employees where YEAR(hire_date)=1991
+
+--Question:25
+select emp_id,emp_name,hire_date,salary from employees where hire_date<'1991-04-01'
+
+--Question:26
+select emp_name,job_name from employees where manager_id IS NULL;
+
+--Question:27
+select * from employees where hire_date='1991-05-01'
+
+--Question:28
+select emp_id,emp_name,salary,CAST(DATEDIFF(YEAR,hire_date,GETDATE()) AS varchar) + ' Years' AS "Experience" from employees
+where manager_id=68319
+
+--Question:29
+select emp_id,emp_name,salary,CAST(DATEDIFF(YEAR,hire_date,GETDATE()) AS varchar) + ' Years' AS "Experience" from employees
+where (salary/30)>100
+
+--Question:30
+select emp_name,hire_date from employees where DATEDIFF(YEAR,hire_date,'2000-01-01')>=8
+
+--Question:31
+select * from employees where salary%2=1
+
+--Question:32
+select * from employees where LEN(CAST(salary AS INT))=3
+
+--Question:33
+select * from employees where MONTH(hire_date)=4
+
+--Question:34
+select * from employees where DAY(hire_date)<19
+
+--Question:35
+select * from employees where job_name='SALESMAN' and DATEDIFF(MONTH,hire_date,GETDATE())>10
+
+--Question:36
+select * from employees where dep_id IN(3001,1001) and YEAR(hire_date)=1991
+
+--Question:37
+select * from employees where dep_id IN(1001,2001)
+
+--Question:38
+select * from employees where dep_id=2001 and job_name='CLERK'
+
+--Question:39
+select * from employees where (commision<=salary and (salary+commision)<34000) and (dep_id=3001 and job_name='SALESMAN')
+
+--Question:40
+select * from employees where job_name IN ('CLERK','MANAGER')
+
+--Question:41
+select * from employees where MONTH(hire_date)<>02
+
+--Question:42
+select * from employees where YEAR(hire_date)=1991
+
+--Question:43
+select * from employees where MONTH(hire_date)=06 and YEAR(hire_date)=1991
+
+--Question:44
+select * from employees where (salary*12) BETWEEN 24000 and 50000
+
+--Question:45
+select * from employees where hire_date IN ('1991-05-01','1991-02-20','1991-12-03')
+
+--Question:46
+select * from employees where manager_id IN (63679,68319,66564,69000)
+
+--Question:47
+select * from employees where MONTH(hire_date)>06 and YEAR(hire_date)=1991
+
+--Question:48
+select * from employees where YEAR(hire_date)>=1990 and YEAR(hire_date)<=1999
+
+--Question:49
+select * from employees where job_name='MANAGER' and dep_id IN(1001,2001)
+
+--Question:50
+select * from employees where MONTH(hire_date)=02 and salary BETWEEN 1001 and 2000
+
+
+
+
+
+
+
