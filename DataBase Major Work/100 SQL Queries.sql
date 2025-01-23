@@ -156,9 +156,66 @@ select * from employees where job_name='MANAGER' and dep_id IN(1001,2001)
 --Question:50
 select * from employees where MONTH(hire_date)=02 and salary BETWEEN 1001 and 2000
 
+--Question:51
+select * from employees where YEAR(hire_date)<>1991
 
+--Question:52
+select e.emp_id,e.emp_name,e.job_name,e.manager_id,e.hire_date,e.salary,e.commision,d.dep_id,d.dep_name 
+from employees AS e LEFT JOIN department as d ON e.dep_id=d.dep_id
 
+--Question:53
+select e.emp_id,e.emp_name,e.job_name,(e.salary*12) AS "Annual Salary",e.dep_id,s.grade
+from employees AS e LEFT JOIN salary_grade as s ON e.salary BETWEEN s.min_salary and s.max_salary
+Where (e.salary*12)>=60000 and job_name<>'ANALYST'
 
+--Question:54
+select e.emp_id,e.emp_name,e.job_name,e.manager_id,e.salary,m.emp_name AS "Manager Name",m.salary AS "Manager Salary"
+from employees AS e LEFT JOIN employees as m ON e.manager_id=m.emp_id WHERE e.salary>m.salary
 
+--Question:55
+select e.emp_name,d.dep_id,e.salary,e.commision from employees as e LEFT JOIN department as d ON e.dep_id=d.dep_id
+where (e.salary between 2000 and 5000) and d.dep_location<>'PERTH'
+
+--Question:56
+select e.emp_name,s.grade,e.dep_id,e.hire_date from employees as e LEFT JOIN salary_grade as s ON e.salary between s.min_salary and s.max_salary
+where e.dep_id IN (1001,3001) and s.grade<>4 and e.hire_date<'1991-12-31'
+
+--Question:57
+select e.emp_id,e.emp_name,e.job_name,e.salary,e.commision,e.manager_id,e.salary,m.emp_name AS "Manager Name"
+from employees AS e LEFT JOIN employees as m ON e.manager_id=m.emp_id WHERE m.emp_name='JONAS'
+
+--Question:58
+select e.emp_name,e.salary,s.grade,s.max_salary from employees as e LEFT JOIN salary_grade as s 
+ON e.salary between s.min_salary and s.max_salary where e.salary=s.max_salary and emp_name='FRANK'
+
+--Question:59
+select * from employees where salary between 2000 and 5000 and commision IS NULL and job_name IN ('MANAGER','ANALYST')
+
+--Question:60
+select e.emp_id,e.emp_name,d.dep_id,e.salary,d.dep_location FROM employees as e LEFT JOIN department as d 
+ON e.dep_id=d.dep_id where d.dep_location IN ('MELBOUNE','PERTH') and DATEDIFF(MONTH,hire_date,GETDATE())>10
+
+--Question:61
+select e.emp_id,e.emp_name,d.dep_id,e.salary,e.hire_date,d.dep_location FROM employees as e LEFT JOIN department as d 
+ON e.dep_id=d.dep_id where YEAR(hire_date)=1991 and d.dep_location IN ('MELBOUNE','SYDNEY') and 
+e.salary BETWEEN 2000 and 5000
+
+--Question:62
+select d.dep_id,d.dep_name,d.dep_location,e.emp_id,e.emp_name,e.salary,s.grade 
+from department as d LEFT JOIN employees as e ON d.dep_id=e.dep_id
+LEFT JOIN salary_grade AS s ON e.salary BETWEEN s.min_salary and s.max_salary
+where dep_name='MARKETING' and dep_location IN ('MELBOURNE','PERTH') and s.grade IN (3,4,5) and
+DATEDIFF(YEAR,hire_date,GETDATE())>=25
+
+--Question:63
+select e.* from employees AS e JOIN employees as m ON e.manager_id=m.emp_id WHERE e.hire_date<m.hire_date
+
+--Question:64
+select e.*,s.grade from employees as e JOIN salary_grade as s ON e.salary BETWEEN s.min_salary and s.max_salary 
+where s.grade=4
+
+--Question:65
+select e.emp_name,e.hire_date,d.dep_name from employees as e LEFT JOIN department as d ON e.dep_id=d.dep_id
+where YEAR(hire_date)>1991 and e.emp_name not IN('MARKER','ADELYN') and d.dep_name NOT IN('PRODUCTION','MARKETING')
 
 
