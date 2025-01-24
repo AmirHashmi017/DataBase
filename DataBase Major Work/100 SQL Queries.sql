@@ -218,4 +218,58 @@ where s.grade=4
 select e.emp_name,e.hire_date,d.dep_name from employees as e LEFT JOIN department as d ON e.dep_id=d.dep_id
 where YEAR(hire_date)>1991 and e.emp_name not IN('MARKER','ADELYN') and d.dep_name NOT IN('PRODUCTION','MARKETING')
 
+--Question:66
+select emp_id,emp_name ,salary from employees ORDER BY salary ASC
+
+--Question:67
+select * from employees ORDER BY dep_id ASC,job_name DESC
+
+--Question:68
+select DISTINCT(job_name) from employees ORDER BY job_name DESC
+
+--Question:69
+select emp_id,emp_name,salary,(salary/30) AS "Daily_salary",(salary*12) AS "Annual Salary" from employees 
+ORDER BY (Salary*12) ASC
+
+--Question:70
+select * from employees where job_name IN ('CLERK','ANALYST') ORDER BY job_name DESC
+
+--Question:71
+select e.emp_name,d.dep_location from employees as e LEFT JOIN department as d 
+on e.dep_id=d.dep_id where e.emp_name='CLARE'
+
+--Question:72
+select * from employees where hire_date IN ('1991-05-01','1991-12-03','1990-01-19') ORDER BY hire_date ASC
+
+--Question:73
+select * from employees where salary<1000 ORDER BY salary ASC
+
+--Question:74
+select * from employees ORDER BY salary ASC
+
+--Question:75
+select * from employees ORDER BY job_name ASC,emp_id DESC
+
+--Question:76
+select DISTINCT job_name from employees where dep_id in (2001,3001)
+
+--Question:77
+select * from employees where job_name not IN ('PRESIDENT','MANAGER') ORDER BY salary ASC
+
+--Question:78
+select emp_id,emp_name,salary,(salary*12) AS "Annual Salary" from employees where (salary*12)<25000
+ORDER BY Salary ASC
+
+--Question:79
+select emp_id,emp_name,job_name,salary,(salary/30) AS "Daily_salary",(salary*12) AS "Annual Salary" from employees 
+where job_name='SALESMAN' ORDER BY (Salary*12) ASC
+
+--Question:80
+select emp_id,emp_name,job_name,salary,hire_date,GETDATE() AS "Current Date",
+DATEDIFF(YEAR,hire_date,GETDATE()) AS "Experience in years" from employees 
+ORDER BY "Experience in years" ASC
+--The use of calculated one experience below is known as Aliasing.
+
+--Question:81
+select * from employees where hire_date>'1991-06-30' ORDER BY job_name ASC
 
