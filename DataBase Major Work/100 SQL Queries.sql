@@ -273,3 +273,80 @@ ORDER BY "Experience in years" ASC
 --Question:81
 select * from employees where hire_date>'1991-06-30' ORDER BY job_name ASC
 
+--Question:82
+select e.emp_name,d.dep_id,d.dep_name,d.dep_location from employees as e LEFT JOIN department as d
+ON e.dep_id=d.dep_id where d.dep_name IN ('FINANCE','AUDIT') ORDER BY d.dep_id ASC
+
+--Question:83
+select e.emp_id,e.emp_name,e.salary,s.grade from employees as e LEFT JOIN salary_grade as s
+ON e.salary BETWEEN s.min_salary and s.max_salary ORDER BY s.grade ASC
+
+--Question:84
+select e.emp_id,e.emp_name,e.job_name,d.dep_id,d.dep_name,e.salary,s.grade 
+from department as d JOIN employees as e ON d.dep_id=e.dep_id LEFT JOIN salary_grade as s
+ON e.salary BETWEEN s.min_salary and s.max_salary ORDER BY d.dep_name ASC
+
+--Question:85
+select e.emp_id,e.emp_name,e.job_name,d.dep_id,d.dep_name,e.salary,s.grade 
+from department as d JOIN employees as e ON d.dep_id=e.dep_id LEFT JOIN salary_grade as s
+ON e.salary BETWEEN s.min_salary and s.max_salary where job_name<>'CLERK' ORDER BY e.salary DESC
+
+--Question:86
+select e.emp_id,e.emp_name,e.job_name,d.dep_id,d.dep_name,e.salary,s.grade 
+from department as d JOIN employees as e ON d.dep_id=e.dep_id LEFT JOIN salary_grade as s
+ON e.salary BETWEEN s.min_salary and s.max_salary where job_name<>'CLERK' ORDER BY e.salary DESC
+
+--Question:87
+select e.*,d.dep_name,d.dep_location from employees as e LEFT JOIN department as d ON d.dep_id=e.dep_id
+
+--Question:88
+select e.*,m.hire_date AS "Manager Hire Date" from employees as e JOIN employees as m 
+ON e.manager_id=m.emp_id where e.hire_date<m.hire_date
+
+--Question:89
+select * from employees where dep_id=1001 ORDER BY salary ASC
+
+--Question:90
+select MAX(salary) AS "Maximum Salary" FROM employees
+
+--Question:91
+select AVG(salary) AS "Average Salary",AVG(salary+ISNULL(commision,0)) AS "Average Remuneration"
+from employees GROUP BY job_name
+
+--Question:92
+select job_name ,SUM(salary*12) AS "Total Annual Salary" FROM employees AS "Annual Salary" 
+WHERE YEAR(hire_date)=1991 GROUP BY job_name
+
+--Question:93
+select e.emp_id,e.emp_name,d.dep_id,d.dep_name,d.dep_location from employees as e 
+LEFT JOIN department as d ON d.dep_id=e.dep_id
+
+--Question:94
+select e.emp_id,e.emp_name,d.dep_id,d.dep_name,d.dep_location from employees as e 
+LEFT JOIN department as d ON d.dep_id=e.dep_id where d.dep_id IN (1001,2001)
+
+--Question:95
+select e.emp_id,e.emp_name,e.salary,s.grade from employees as e LEFT JOIN salary_grade as s 
+ON e.salary BETWEEN s.min_salary and s.max_salary
+
+--Question:96
+select m.emp_id AS "ManagerID",m.emp_name AS "Manager Name", COUNT(e.emp_id) AS "Number of Employees Under"
+FROM employees as m JOIN employees AS e ON m.emp_id=e.manager_id GROUP BY m.emp_id,m.emp_name 
+ORDER BY "Number of Employees Under" ASC
+
+--Question:97
+select dep_id,job_name,COUNT(emp_id) AS "No. of Employees" from employees GROUP BY dep_id,job_name 
+
+--Question:98
+select dep_id,COUNT(emp_id) AS "No. of Employees" from employees GROUP BY dep_id HAVING COUNT(emp_id)>=2
+
+--Question:99
+select s.grade,s.max_salary,COUNT(e.emp_id) AS "No. Of Employees" FROM salary_grade AS s LEFT JOIN employees AS e 
+ON e.salary BETWEEN s.min_salary and s.max_salary GROUP BY s.grade,s.max_salary
+
+--Question:100
+select d.dep_name,s.grade,COUNT(e.emp_id) AS "No. Of Employees" FROM department AS d LEFT JOIN employees AS e 
+ON d.dep_id=e.dep_id LEFT JOIN salary_grade AS s
+ON e.salary BETWEEN s.min_salary and s.max_salary WHERE e.job_name='SALESMAN' GROUP BY d.dep_id,d.dep_name,s.grade HAVING 
+COUNT(e.emp_id)>=2
+
