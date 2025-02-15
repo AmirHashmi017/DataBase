@@ -112,3 +112,30 @@ VALUES ('SCHE07', 'D001', '2025-02-17', '10:00:00', '11:00:00', 'Available'),
 ('SCHE05', 'D001', '2024-01-01', '10:00:00', '11:00:00', 'Available');
 
 SELECT * FROM DoctorSchedule
+
+--Testing Trigger 4
+--Patient Testing
+INSERT INTO Patient (PatientID, LoginPassword, PatientName, DOB, Gender, PhoneNumber) 
+VALUES ('P007', 'pass123', 'Jane Doe', '1990-05-20', 'Female', '1234567890');
+
+UPDATE Patient SET PhoneNumber = '0987654321' WHERE PatientID = 'P007';
+
+DELETE FROM Patient WHERE PatientID = 'P007';
+
+SELECT * FROM PatientLog;
+
+--Testing Trigger 8
+INSERT INTO Prescription (PrescriptionID, PatientID, DoctorID, Dosage, Medicine, DoctorRemarks) 
+VALUES ('PR001', 'P004', 'D001', '1 tablet twice a day', 'Paracetamol', 'Take after meal');
+
+UPDATE Prescription SET Dosage = '1 tablet once a day' WHERE PrescriptionID = 'PR001';
+
+DELETE FROM Prescription WHERE PrescriptionID = 'PR001';
+
+SELECT * FROM PrescriptionLog;
+
+--Testing Trigger 12
+INSERT INTO Admin (AdminID, LoginPassword, AdminName, PhoneNumber, Email) VALUES ('A201', 'pass123', 'John Doe', '1234567890', 'admin@example.com');
+UPDATE Admin SET PhoneNumber = '0987654321' WHERE AdminID = 'A201';
+DELETE FROM Admin WHERE AdminID = 'A201';
+SELECT * FROM AdminLog;

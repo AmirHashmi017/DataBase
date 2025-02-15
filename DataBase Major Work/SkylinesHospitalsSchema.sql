@@ -21,6 +21,19 @@ AdminName VARCHAR(50),
 PhoneNumber VARCHAR(50),
 Email VARCHAR(50)
 );
+--Admin Log Table
+create table AdminLog
+(
+AdminID VARCHAR(50),
+LoginPassword VARCHAR(50),
+AdminName VARCHAR(50),
+PhoneNumber VARCHAR(50),
+Email VARCHAR(50),
+OperationType TEXT,
+ModifiedAt DateTime Default GetDate(),
+ModifiedBY VARCHAR(100) DEFAULT SUSER_NAME()
+);
+DROP Table AdminLog
 create table Nurse
 (
 NurseID VARCHAR(50) PRIMARY KEY,
@@ -39,6 +52,20 @@ PatientName VARCHAR(50),
 DOB DATE,
 Gender VARCHAR(50),
 PhoneNumber VARCHAR(50)
+);
+
+--Log Table For Patient
+CREATE Table PatientLog
+(
+PatientID VARCHAR(50),
+LoginPassword VARCHAR(50),
+PatientName VARCHAR(50),
+DOB DATE,
+Gender VARCHAR(50),
+PhoneNumber VARCHAR(50),
+OperationType TEXT,
+ModifiedAt DateTime DEFAULT GetDate(),
+ModifiedBy VARCHAR(100) DEFAULT SUSER_NAME()
 );
 
 create table Doctor
@@ -74,6 +101,21 @@ FOREIGN KEY (DoctorID) REFERENCES Doctor(DoctorID),
 Dosage VARCHAR(150),
 Medicine VARCHAR(150),
 DoctorRemarks VARCHAR(250)
+);
+--Prescription Log Table
+create table PrescriptionLog
+(
+PrescriptionID VARCHAR(50),
+PatientID VARCHAR(50),
+FOREIGN KEY (PatientID) REFERENCES Patient(PatientID),
+DoctorID VARCHAR(50),
+FOREIGN KEY (DoctorID) REFERENCES Doctor(DoctorID),
+Dosage VARCHAR(150),
+Medicine VARCHAR(150),
+DoctorRemarks VARCHAR(250),
+OperationType TEXT,
+ModifiedAt DateTime Default GetDate(),
+ModifiedBY VARCHAR(100) DEFAULT SUSER_NAME()
 );
 
 create table PatientRoomBooking

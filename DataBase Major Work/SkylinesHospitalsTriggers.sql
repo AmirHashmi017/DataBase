@@ -222,3 +222,102 @@ BEGIN
 	END
 END;
 DROP Trigger PreventWeekends;
+
+--Create a trigger to log all changes made to the Patient table 
+--(inserts, updates, and deletes) into the PatientLog table. 
+--Include the old and new values for updates.
+GO
+CREATE Trigger LogPatient
+ON Patient AFTER INSERT,UPDATE,DELETE AS
+BEGIN
+	IF EXISTS(SELECT 1 FROM inserted) and NOT Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO PatientLog(PatientID ,LoginPassword ,PatientName,DOB,Gender,PhoneNumber,OperationType)
+		SELECT i.PatientID ,i.LoginPassword ,i.PatientName,i.DOB,i.Gender,i.PhoneNumber,'Insert' 
+		FROM Inserted AS i
+	END
+	IF EXISTS(SELECT 1 FROM inserted) and Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO PatientLog(PatientID ,LoginPassword ,PatientName,DOB,Gender,PhoneNumber,OperationType)
+		SELECT d.PatientID ,d.LoginPassword ,d.PatientName,d.DOB,d.Gender,d.PhoneNumber,'Before Update' 
+		FROM deleted AS d
+
+		INSERT INTO PatientLog(PatientID ,LoginPassword ,PatientName,DOB,Gender,PhoneNumber,OperationType)
+		SELECT i.PatientID ,i.LoginPassword ,i.PatientName,i.DOB,i.Gender,i.PhoneNumber,'After Update' 
+		FROM Inserted AS i
+		
+	END
+	IF NOT EXISTS(SELECT 1 FROM inserted) and Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO PatientLog(PatientID ,LoginPassword ,PatientName,DOB,Gender,PhoneNumber,OperationType)
+		SELECT d.PatientID ,d.LoginPassword ,d.PatientName,d.DOB,d.Gender,d.PhoneNumber,'DELETE' 
+		FROM deleted AS d
+	END
+END;
+DROP Trigger LogPatient;
+
+
+--Create a trigger to log all changes made to the Prescription table 
+--(inserts, updates, and deletes) into the PrescriptionLog table. 
+--Include the old and new values for updates.
+GO
+CREATE Trigger LogPrescription
+ON Prescription AFTER INSERT,UPDATE,DELETE AS
+BEGIN
+	IF EXISTS(SELECT 1 FROM inserted) and NOT Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO PrescriptionLog(PrescriptionID, PatientID,DoctorID ,Dosage,Medicine,DoctorRemarks,OperationType)
+		SELECT i.PrescriptionID,i.PatientID,i.DoctorID ,i.Dosage,i.Medicine,i.DoctorRemarks,'INSERT' 
+		FROM inserted AS i
+	END
+	IF EXISTS(SELECT 1 FROM inserted) and Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO PrescriptionLog(PrescriptionID, PatientID,DoctorID ,Dosage,Medicine,DoctorRemarks,OperationType)
+		SELECT d.PrescriptionID,d.PatientID,d.DoctorID ,d.Dosage,d.Medicine,d.DoctorRemarks,'Before Update' 
+		FROM deleted AS d
+
+		INSERT INTO PrescriptionLog(PrescriptionID, PatientID,DoctorID ,Dosage,Medicine,DoctorRemarks,OperationType)
+		SELECT i.PrescriptionID,i.PatientID,i.DoctorID ,i.Dosage,i.Medicine,i.DoctorRemarks,'After Update' 
+		FROM inserted AS i
+		
+	END
+	IF NOT EXISTS(SELECT 1 FROM inserted) and Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO PrescriptionLog(PrescriptionID, PatientID,DoctorID ,Dosage,Medicine,DoctorRemarks,OperationType)
+		SELECT d.PrescriptionID,d.PatientID,d.DoctorID ,d.Dosage,d.Medicine,d.DoctorRemarks,'Delete' 
+		FROM deleted AS d
+	END
+END;
+DROP Trigger LogPrescription;
+
+--Create a trigger to log all changes made to the Admin table 
+--(inserts, updates, and deletes) into the AdminLog table. Include the old and new values for updates.
+GO
+CREATE Trigger LogAdmin
+ON Admin AFTER INSERT,UPDATE,DELETE AS
+BEGIN
+	IF EXISTS(SELECT 1 FROM inserted) and NOT Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO AdminLog(AdminID ,LoginPassword ,AdminName,PhoneNumber,Email,OperationType)
+		SELECT i.AdminID ,i.LoginPassword ,i.AdminName,i.PhoneNumber,i.Email,'Insert' 
+		FROM Inserted AS i
+	END
+	IF EXISTS(SELECT 1 FROM inserted) and Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO AdminLog(AdminID ,LoginPassword ,AdminName,PhoneNumber,Email,OperationType)
+		SELECT d.AdminID ,d.LoginPassword ,d.AdminName,d.PhoneNumber,d.Email,'Before Update' 
+		FROM Deleted AS d
+
+		INSERT INTO AdminLog(AdminID ,LoginPassword ,AdminName,PhoneNumber,Email,OperationType)
+		SELECT i.AdminID ,i.LoginPassword ,i.AdminName,i.PhoneNumber,i.Email,'After Update' 
+		FROM Inserted AS i
+		
+	END
+	IF NOT EXISTS(SELECT 1 FROM inserted) and Exists(SELECT 1 from deleted)
+	BEGIN
+		INSERT INTO AdminLog(AdminID ,LoginPassword ,AdminName,PhoneNumber,Email,OperationType)
+		SELECT d.AdminID ,d.LoginPassword ,d.AdminName,d.PhoneNumber,d.Email,'Delete' 
+		FROM Deleted AS d
+	END
+END;
+DROP Trigger LogAdmin;
