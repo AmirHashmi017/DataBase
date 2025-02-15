@@ -24,6 +24,7 @@ VALUES ('S002', 'D001', '2025-02-16', '10:00:00', '11:00:00', 'Available');
 	SELECT * FROM Room;
 	INSERT INTO PatientRoomBooking (RoomID, PatientID) VALUES ('R002', 'P004'),('R002','p004'),('R004','p004');
 	DELETE FROM PatientRoomBooking WHERE RoomID IN('R002','R004') AND PatientID = 'P004';
+	DELETE FROM PatientRoomBooking WHERE PatientID = 'P004';
 	SELECT * FROM PatientRoomBooking
 	
 
@@ -82,3 +83,32 @@ SELECT * FROM Doctor
 SELECT * FROM Patient
 INSERT INTO Prescription (PrescriptionID, PatientID, DoctorID, Dosage, Medicine, DoctorRemarks) 
 VALUES ('PR006', 'P007', 'DOC999', '1 tablet twice a day', 'Paracetamol', 'Take after meal');
+
+--Testing Trigger 15
+INSERT INTO DoctorSchedule (ScheduleID, DoctorID, AvailableDate, StartTime, EndTime, Status) 
+	VALUES ('S008', 'D001', '2025-02-14', '09:00:00', '09:30:00', 'Available'),
+	('S007', 'D001', '2025-02-14', '09:31:00', '09:59:00', 'Available');
+	SELECT * FROM DoctorSchedule;
+
+--Testing Trigger 17
+SELECT * FROM DoctorSchedule
+INSERT INTO Appointment (AppointmentID, PatientID, DoctorID, AppointmentDate, AppointmentTime) 
+VALUES ('A218', 'P005', 'D001', '2025-02-14', '09:29:00'),('A219', 'P005', 'D001', '2026-01-01', '10:32:00');
+SELECT * FROM Appointment;
+SELECT * FROM Patient;
+
+--Testing Trigger 18
+INSERT INTO PatientRoomBooking (RoomID, PatientID) 
+	VALUES ('R004', 'P004');
+	SELECT * FROM Room
+	SELECT * FROM PatientRoomBooking
+	--Test Query Invalid
+	INSERT INTO PatientRoomBooking (PatientID) 
+	VALUES ('P004'),('P004'),('P005');
+
+--Testing Trigger 19
+INSERT INTO DoctorSchedule (ScheduleID, DoctorID, AvailableDate, StartTime, EndTime, Status) 
+VALUES ('SCHE07', 'D001', '2025-02-17', '10:00:00', '11:00:00', 'Available'),
+('SCHE05', 'D001', '2024-01-01', '10:00:00', '11:00:00', 'Available');
+
+SELECT * FROM DoctorSchedule

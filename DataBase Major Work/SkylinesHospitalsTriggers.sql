@@ -156,4 +156,69 @@ BEGIN
 	END
 END;
 DROP Trigger HandlePrescription;
-		
+
+--Create a trigger to prevent a doctor from having overlapping schedules 
+--(i.e., two schedules with the same AvailableDate and overlapping StartTime and EndTime). 
+--If such an attempt is made, raise an error and roll back the transaction.
+GO
+CREATE Trigger OverlapDoctorSchedule
+ON DoctorSchedule AFTER INSERT,UPDATE AS
+BEGIN
+	IF EXISTS(SELECT 1 FROM inserted as i JOIN DoctorSchedule AS ds ON i.DoctorID=ds.DoctorID and 
+	i.AvailableDate=ds.AvailableDate and ((i.StartTime Between ds.StartTime and ds.EndTime) OR (i.EndTime
+	BETWEEN ds.StartTime and ds.EndTime)) WHERE i.ScheduleID<>ds.ScheduleID)
+	BEGIN
+		ROLLBACK Transaction;
+		RAISERROR('The Doctor Schedule cannot overlap',16,1);
+	END
+END;
+DROP Trigger OverlapDoctorSchedule;
+
+--Create a trigger to ensure that an appointment's AppointmentTime falls 
+--within the doctor's available schedule (StartTime and EndTime). 
+--If such an attempt is made, raise an error and roll back the transaction.
+GO
+CREATE Trigger ValidateAppointment 
+ON Appointment AFTER INSERT AS
+BEGIN
+	IF EXISTS(SELECT 1 FROM inserted as i LEFT JOIN DoctorSchedule AS d ON i.DoctorID=d.DoctorID 
+	and i.AppointmentDate=d.AvailableDate and i.AppointmentTime BETWEEN d.StartTime and d.EndTime
+	WHERE d.DoctorID IS NULL)
+	BEGIN
+		ROLLBACK Transaction;
+		RAISERROR('No mathcing schedule Found',16,1);
+	END
+END;
+DROP Trigger ValidateAppointment;
+
+--Create a trigger to automatically assign a room to a patient when a new PatientRoomBooking is inserted. 
+--The room should be assigned based on availability and department.
+GO
+CREATE Trigger RoomBooking
+ON PatientRoomBooking AFTER INSERT AS
+BEGIN
+	UPDATE pr SET pr.RoomID=r.RoomID FROM PatientRoomBooking as pr JOIN
+	inserted as i ON i.PatientID=pr.PatientID  CROSS APPLY (
+        SELECT TOP 1 RoomID 
+        FROM Room
+        WHERE AvailableBeds > 0
+		ORDER BY RoomID DESC
+    ) AS r WHERE
+	pr.RoomID IS NULL;
+END;
+DROP Trigger RoomBooking;
+
+--Create a trigger to prevent the insertion of a doctor's schedule 
+--if the AvailableDate is a weekend (Saturday or Sunday). 
+--If such an attempt is made, raise an error and roll back the transaction.
+GO
+CREATE Trigger PreventWeekends
+ON DoctorSchedule AFTER INSERT,UPDATE AS
+BEGIN
+	IF EXISTS(SELECT 1 FROM inserted AS i WHERE DATEPART(WEEKDAY,i.AvailableDate) IN (7,1))
+	BEGIN
+		ROLLBACK Transaction;
+		RAISERROR('No schedule can be added for weekends',16,1);
+	END
+END;
+DROP Trigger PreventWeekends;
