@@ -147,3 +147,14 @@ FOREIGN KEY (DoctorID) REFERENCES Doctor(DoctorID),
 AppointmentDate Date,
 AppointmentTime Time
 );
+
+--Creating table For logging of all database
+CREATE TABLE SkylinesLog
+(
+TableName varchar(128),
+OperationType varchar(50),
+ChangedBy varchar(100) DEFAULT SUSER_NAME(),
+ChangedAt DATETIME DEFAULT GETDATE()
+);
+
+DROP TABLE SkylinesLog

@@ -139,3 +139,25 @@ INSERT INTO Admin (AdminID, LoginPassword, AdminName, PhoneNumber, Email) VALUES
 UPDATE Admin SET PhoneNumber = '0987654321' WHERE AdminID = 'A201';
 DELETE FROM Admin WHERE AdminID = 'A201';
 SELECT * FROM AdminLog;
+
+--Testing DDL Trigger 1
+DROP TABLE Admin;
+SELECT * FROM SkylinesLog
+
+--Testing DDL Trigger 2
+CREATE TABLE Test(
+TestID VARCHAR(50) PRIMARY KEY,
+TestName VARCHAR(50)
+);
+ALTER Table Test DROP COLUMN TestName;
+SELECT * FROM SkylinesLog
+
+--Testing DDL Trigger 3
+
+ALTER Table Patient ADD TestName INT;
+SELECT * FROM SkylinesLog
+
+--Testing DDL Trigger 4
+
+ALTER Table Patient ALTER COLUMN PhoneNumber VARCHAR(50);
+SELECT * FROM SkylinesLog

@@ -321,3 +321,120 @@ BEGIN
 	END
 END;
 DROP Trigger LogAdmin;
+
+--DDL Triggers
+--Create a DDL trigger that prevents the deletion of the tables Admin, Doctor, and Patient. 
+--If someone tries to drop any of these tables, log the attempt in SkylinesLog.
+GO
+CREATE Trigger PreventDrop 
+ON DATABASE FOR DROP_TABLE AS
+BEGIN
+	DECLARE @EventData XML=EVENTDATA();
+	DECLARE @TableName VARCHAR(128);
+	DECLARE @OperationType VARCHAR(50);
+
+	SET @TableName=@EventData.value('(/EVENT_INSTANCE/ObjectName)[1]','VARCHAR(128)');
+	SET @OperationType=@EventData.value('(/EVENT_INSTANCE/EventType)[1]','VARCHAR(50)');
+
+
+	if @TableName IN ('Admin','Doctor','Patient')
+	BEGIN
+		ROLLBACK
+		RAISERROR('Cannot Drop These Tables',16,1);
+	END
+	INSERT INTO SkylinesLog(TableName,OperationType)
+	VALUES(@TableName,@OperationType)
+END;
+
+DROP Trigger PreventDrop ON DATABASE
+
+--Create a trigger that logs any CREATE, ALTER, or DROP operation performed on any table in the database. 
+--Log the operation type and table name in SkylinesLog.
+GO
+CREATE Trigger LogSchemaChanges
+ON DATABASE FOR Create_Table,Drop_Table,Alter_Table AS
+BEGIN
+	DECLARE @EventData XML=EVENTDATA();
+	DECLARE @TableName VARCHAR(128);
+	DECLARE @OperationType VARCHAR(50);
+
+	Set @TableName=@EventData.value('(/EVENT_INSTANCE/ObjectName)[1]','VARCHAR(128)')
+	SET @OperationType=@EventData.value('(/EVENT_INSTANCE/EventType)[1]','VARCHAR(50)')
+
+	INSERT INTO SkylinesLog(TableName,OperationType)
+	VALUES(@TableName,@OperationType);
+END;
+DROP TRIGGER LogSchemaChanges ON DATABASE;
+
+--Prevent adding new columns to the Patient table. 
+--If a user tries to add a column, roll back the transaction and display an error message.
+GO
+CREATE Trigger PreventAddingColumn
+ON DATABASE FOR Alter_table AS
+BEGIN
+DECLARE @EventData XML=EVENTDATA();
+	DECLARE @TableName VARCHAR(128);
+	DECLARE @OperationType VARCHAR(50);
+	DECLARE @TSQLCommand VARCHAR(50);
+	DECLARE @Alteroperation VARCHAR(10);
+	DECLARE @Altercolumn VARCHAR(20);
+
+	Set @TableName=@EventData.value('(/EVENT_INSTANCE/ObjectName)[1]','VARCHAR(128)')
+	SET @OperationType=@EventData.value('(/EVENT_INSTANCE/EventType)[1]','VARCHAR(50)')
+	SET @TSQLCommand=LOWER(@EventData.value('(/EVENT_INSTANCE/TSQLCommand)[1]','VARCHAR(50)'))
+	
+	if CHARINDEX('add',@TSQLCommand)>0
+		SET @Alteroperation='ADD COLUMN';
+
+	if(@TableName='Patient' and @Alteroperation='ADD COLUMN')
+	BEGIN
+		ROLLBACK;
+		RAISERROR('Cannot Add column To Patient Table',16,1);
+	END
+
+END;
+
+DROP TRIGGER PreventAddingColumn ON DATABASE;
+
+--Create a DDL trigger that prevents the modification of the data type of 
+--PhoneNumber in any table (e.g., Patient, Doctor, Admin).
+GO
+CREATE Trigger PreventChangingColumn
+ON DATABASE FOR Alter_table AS
+BEGIN
+DECLARE @EventData XML=EVENTDATA();
+	DECLARE @TableName VARCHAR(128);
+	DECLARE @OperationType VARCHAR(50);
+	DECLARE @TSQLCommand VARCHAR(50);
+	DECLARE @Alteroperation VARCHAR(20);
+	DECLARE @Altercolumn VARCHAR(20);
+	DECLARE @NewDataType VARCHAR(10);
+
+	Set @TableName=@EventData.value('(/EVENT_INSTANCE/ObjectName)[1]','VARCHAR(128)')
+	SET @OperationType=@EventData.value('(/EVENT_INSTANCE/EventType)[1]','VARCHAR(50)')
+	SET @TSQLCommand=LOWER(@EventData.value('(/EVENT_INSTANCE/TSQLCommand)[1]','VARCHAR(50)'))
+	if CHARINDEX('alter column',@TSQLCommand)>0
+		SET @Alteroperation='MODIFY COLUMN';
+	IF @Alteroperation = 'MODIFY COLUMN'
+    BEGIN
+        SET @Altercolumn = SUBSTRING(
+            @TSQLCommand,
+            CHARINDEX(' alter column ', @TSQLCommand) + 14, 
+            CHARINDEX(' ', @TSQLCommand + ' ', CHARINDEX(' alter column ', @TSQLCommand) + 14) - CHARINDEX(' alter column ', @TSQLCommand) - 14
+        );
+    END
+
+	SET @NewDataType = LTRIM(SUBSTRING(
+        @TSQLCommand,
+        CHARINDEX(@Altercolumn, @TSQLCommand) + LEN(@Altercolumn) + 1, 
+        LEN(@TSQLCommand)
+    ));
+	if(@Altercolumn='PhoneNumber' and  @NewDataType IS NOT NULL)
+	BEGIN
+		ROLLBACK;
+		RAISERROR('Cannot Change Datatype of column Phone Number',16,1);
+	END
+
+END;
+
+DROP TRIGGER PreventChangingColumn ON DATABASE;
