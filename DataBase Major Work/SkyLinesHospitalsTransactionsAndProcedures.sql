@@ -316,3 +316,30 @@ BEGIN
 END;
 
 DROP Procedure RegisterMultiplePatientWithRoom;
+
+--Transaction with savepoint
+BEGIN TRANSACTION;
+
+DECLARE @Count INT;
+SET @Count = 0;
+
+INSERT INTO Department (DepartmentID, DepartmentName)
+VALUES ('1123', 'Cardiology');
+
+SAVE TRANSACTION L1;
+INSERT INTO Admin (AdminID, LoginPassword, AdminName, PhoneNumber, Email)
+VALUES ('1443', '123', 'Amir Hash', '03284136880', 'am@gmail.com');
+
+SET @Count = (SELECT COUNT(*) FROM Department WHERE DepartmentName = 'Cardiology');
+
+IF @Count > 1
+BEGIN
+    ROLLBACK TRANSACTION L1;
+    PRINT 'Duplicate department found, rolling back to savepoint L1';
+END
+ELSE
+BEGIN
+    COMMIT TRANSACTION;
+    PRINT 'Transaction committed successfully';
+END
+SELECT * FROM Admin
